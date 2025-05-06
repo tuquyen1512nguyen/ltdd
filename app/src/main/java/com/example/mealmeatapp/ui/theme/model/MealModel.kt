@@ -7,11 +7,19 @@ data class Meal(
     val name: String,
     val imageResId: Int,
     val category: String,
+    val calories: Int,
+    val weight: Int, // gram
+    val protein: Int, // gram
+    val fat: Int,     // gram
+    val carbs: Int,    // gram
     val ingredients: List<String>,
-    val instructions: List<String>
+    val instructions: List<String>,
+    val dayOfWeek: String = "" // Thêm thuộc tính này // Thêm thuộc tính này
 )
 
 class MealRepository {
+    private val days = listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
+    private val random = kotlin.random.Random
     private val meals = listOf(
         // Bữa sáng
         Meal(
@@ -19,6 +27,11 @@ class MealRepository {
             name = "Bánh mì trứng",
             imageResId = R.drawable.banhmi_trung,
             category = "Breakfast",
+            calories = 350,
+            weight = 180,
+            protein = 14,
+            fat = 18,
+            carbs = 28,
             ingredients = listOf(
                 "1 ổ bánh mì.",
                 "2 quả trứng gà.",
@@ -27,11 +40,11 @@ class MealRepository {
                 "1 thìa dầu ăn."
             ),
             instructions = listOf(
-                "1. Đánh tan trứng với chút muối, tiêu và hành lá.",
-                "2. Làm nóng chảo với dầu ăn.",
-                "3. Đổ trứng vào chiên lửa vừa đến khi chín vàng.",
-                "4. Xẻ bánh mì, cho trứng vào giữa.",
-                "5. Có thể thêm chút xì dầu hoặc tương ớt tùy thích."
+                "Đánh tan trứng với chút muối, tiêu và hành lá.",
+                "Làm nóng chảo với dầu ăn.",
+                "Đổ trứng vào chiên lửa vừa đến khi chín vàng.",
+                "Xẻ bánh mì, cho trứng vào giữa.",
+                "Có thể thêm chút xì dầu hoặc tương ớt tùy thích."
             )
         ),
         Meal(
@@ -39,6 +52,11 @@ class MealRepository {
             name = "Bún riêu",
             imageResId = R.drawable.bun_rieu,
             category = "Breakfast",
+            calories = 450,
+            weight = 400,
+            protein = 25,
+            fat = 10,
+            carbs = 50,
             ingredients = listOf(
                 "300g bún tươi.",
                 "200g cua đồng.",
@@ -49,12 +67,12 @@ class MealRepository {
                 "Gia vị: mắm, muối, hạt nêm."
             ),
             instructions = listOf(
-                "1. Giã cua, lọc lấy nước cua.",
-                "2. Phi thơm hành tỏi, xào cà chua đến khi mềm.",
-                "3. Cho nước cua vào đun sôi.",
-                "4. Thả đậu hũ và thịt băm vào nồi.",
-                "5. Nêm nếm vừa ăn.",
-                "6. Trình bày với bún và rau thơm."
+                "Giã cua, lọc lấy nước cua.",
+                "Phi thơm hành tỏi, xào cà chua đến khi mềm.",
+                "Cho nước cua vào đun sôi.",
+                "Thả đậu hũ và thịt băm vào nồi.",
+                "Nêm nếm vừa ăn.",
+                "Trình bày với bún và rau thơm."
             )
         ),
         Meal(
@@ -62,6 +80,11 @@ class MealRepository {
             name = "Phở bò",
             imageResId = R.drawable.pho_bo,
             category = "Breakfast",
+            calories = 400,
+            weight = 350,
+            protein = 30,
+            fat = 10,
+            carbs = 45,
             ingredients = listOf(
                 "300g bánh phở.",
                 "200g thịt bò.",
@@ -71,11 +94,11 @@ class MealRepository {
                 "Gia vị: muối, đường, nước mắm."
             ),
             instructions = listOf(
-                "1. Hầm xương bò với gừng, hành tím, quế hồi.",
-                "2. Thái mỏng thịt bò.",
-                "3. Chần bánh phở qua nước sôi.",
-                "4. Xếp thịt bò lên trên, chan nước dùng nóng.",
-                "5. Thêm hành lá, rau thơm."
+                "Hầm xương bò với gừng, hành tím, quế hồi.",
+                "Thái mỏng thịt bò.",
+                "Chần bánh phở qua nước sôi.",
+                "Xếp thịt bò lên trên, chan nước dùng nóng.",
+                "Thêm hành lá, rau thơm."
             )
         ),
         Meal(
@@ -83,15 +106,20 @@ class MealRepository {
             name = "Xôi gà",
             imageResId = R.drawable.xoi_ga,
             category = "Breakfast",
+            calories = 380,
+            weight = 300,
+            protein = 22,
+            fat = 10,
+            carbs = 45,
             ingredients = listOf(
                 "200g xôi.",
                 "100g thịt gà.",
                 "Hành phi."
             ),
             instructions = listOf(
-                "1. Nấu xôi cho chín.",
-                "2. Luộc thịt gà và xé nhỏ.",
-                "3. Trộn xôi với thịt gà và hành phi."
+                "Nấu xôi cho chín.",
+                "Luộc thịt gà và xé nhỏ.",
+                "Trộn xôi với thịt gà và hành phi."
             )
         ),
         Meal(
@@ -99,15 +127,20 @@ class MealRepository {
             name = "Cháo trắng trứng muối",
             imageResId = R.drawable.chao_trang_trung_muoi,
             category = "Breakfast",
+            calories = 250,
+            weight = 250,
+            protein = 10,
+            fat = 6,
+            carbs = 35,
             ingredients = listOf(
                 "1 chén gạo.",
                 "500ml nước.",
                 "2 quả trứng muối."
             ),
             instructions = listOf(
-                "1. Nấu gạo với nước cho đến khi nhuyễn.",
-                "2. Thái nhỏ trứng muối.",
-                "3. Trình bày cháo với trứng muối."
+                "Nấu gạo với nước cho đến khi nhuyễn.",
+                "Thái nhỏ trứng muối.",
+                "Trình bày cháo với trứng muối."
             )
         ),
         Meal(
@@ -115,15 +148,20 @@ class MealRepository {
             name = "Bánh cuốn",
             imageResId = R.drawable.banh_cuon,
             category = "Breakfast",
+            calories = 340,
+            weight = 280,
+            protein = 14,
+            fat = 8,
+            carbs = 40,
             ingredients = listOf(
                 "200g bột gạo.",
                 "300ml nước.",
                 "Thịt băm, nấm hương, hành phi."
             ),
             instructions = listOf(
-                "1. Pha bột với nước thành hỗn hợp sền sệt.",
-                "2. Đổ bột vào chảo và hấp chín.",
-                "3. Cuốn nhân thịt và nấm vào bánh."
+                "Pha bột với nước thành hỗn hợp sền sệt.",
+                "Đổ bột vào chảo và hấp chín.",
+                "Cuốn nhân thịt và nấm vào bánh."
             )
         ),
         Meal(
@@ -131,6 +169,11 @@ class MealRepository {
             name = "Mì quảng",
             imageResId = R.drawable.mi_quang,
             category = "Breakfast",
+            calories = 370,
+            weight = 320,
+            protein = 20,
+            fat = 9,
+            carbs = 45,
             ingredients = listOf(
                 "200g mì quảng.",
                 "100g thịt heo.",
@@ -138,9 +181,9 @@ class MealRepository {
                 "Gia vị: nước mắm, tiêu."
             ),
             instructions = listOf(
-                "1. Nấu nước dùng từ xương heo.",
-                "2. Luộc tôm và thịt heo.",
-                "3. Trình bày mì với nước dùng và rau sống."
+                "Nấu nước dùng từ xương heo.",
+                "Luộc tôm và thịt heo.",
+                "Trình bày mì với nước dùng và rau sống."
             )
         ),
         Meal(
@@ -148,15 +191,20 @@ class MealRepository {
             name = "Cơm gà",
             imageResId = R.drawable.ga,
             category = "Lunch",
+            calories = 450,
+            weight = 350,
+            protein = 28,
+            fat = 20,
+            carbs = 10,
             ingredients = listOf(
                 "1 con gà.",
                 "Gạo tẻ.",
                 "Gia vị: muối, tiêu, nước mắm."
             ),
             instructions = listOf(
-                "1. Luộc gà cho chín.",
-                "2. Nấu cơm với nước luộc gà.",
-                "3. Thái gà và trình bày cùng cơm."
+                "Luộc gà cho chín.",
+                "Nấu cơm với nước luộc gà.",
+                "Thái gà và trình bày cùng cơm."
             )
         ),
         Meal(
@@ -164,14 +212,19 @@ class MealRepository {
             name = "Cá kho tộ",
             imageResId = R.drawable.ca_kho_to,
             category = "Lunch",
+            calories = 400,
+            weight = 350,
+            protein = 30,
+            fat = 12,
+            carbs = 40,
             ingredients = listOf(
                 "500g cá lóc.",
                 "Gia vị: nước mắm, tiêu, đường."
             ),
             instructions = listOf(
-                "1. Thái cá thành từng miếng.",
-                "2. Ướp cá với gia vị.",
-                "3. Kho cá trong nồi đất cho đến khi thấm."
+                "Thái cá thành từng miếng.",
+                "Ướp cá với gia vị.",
+                "Kho cá trong nồi đất cho đến khi thấm."
             )
         ),
         Meal(
@@ -179,15 +232,20 @@ class MealRepository {
             name = "Thịt kho trứng",
             imageResId = R.drawable.thit_kho_trung,
             category = "Lunch",
+            calories = 380,
+            weight = 300,
+            protein = 35,
+            fat = 15,
+            carbs = 8,
             ingredients = listOf(
                 "400g thịt ba chỉ.",
                 "4 quả trứng.",
                 "Gia vị: nước mắm, tiêu."
             ),
             instructions = listOf(
-                "1. Luộc trứng cho chín.",
-                "2. Thái thịt và ướp gia vị.",
-                "3. Kho thịt với trứng cho đến khi thấm."
+                "Luộc trứng cho chín.",
+                "Thái thịt và ướp gia vị.",
+                "Kho thịt với trứng cho đến khi thấm."
             )
         ),
         Meal(
@@ -195,15 +253,20 @@ class MealRepository {
             name = "Canh chua cá lóc",
             imageResId = R.drawable.canh_chua_ca_loc,
             category = "Lunch",
+            calories = 300,
+            weight = 300,
+            protein = 25,
+            fat = 6,
+            carbs = 12,
             ingredients = listOf(
                 "300g cá lóc.",
                 "200g cà chua.",
                 "Gia vị: me, nước mắm."
             ),
             instructions = listOf(
-                "1. Nấu nước dùng với me.",
-                "2. Thêm cá và cà chua vào nấu chín.",
-                "3. Nêm nếm vừa ăn."
+                "Nấu nước dùng với me.",
+                "Thêm cá và cà chua vào nấu chín.",
+                "Nêm nếm vừa ăn."
             )
         ),
         Meal(
@@ -211,14 +274,19 @@ class MealRepository {
             name = "Gà kho gừng",
             imageResId = R.drawable.ga_kho_gung,
             category = "Lunch",
+            calories = 450,
+            weight = 400,
+            protein = 32,
+            fat = 10,
+            carbs = 50,
             ingredients = listOf(
                 "500g gà.",
                 "50g gừng.",
                 "Gia vị: nước mắm, tiêu."
             ),
             instructions = listOf(
-                "1. Thái gừng và ướp gà với gia vị.",
-                "2. Kho gà với gừng cho đến khi thấm."
+                "Thái gừng và ướp gà với gia vị.",
+                "Kho gà với gừng cho đến khi thấm."
             )
         ),
         Meal(
@@ -226,14 +294,19 @@ class MealRepository {
             name = "Cơm gà xối mỡ",
             imageResId = R.drawable.com_ga_xoi_mo,
             category = "Lunch",
+            calories = 480,
+            weight = 380,
+            protein = 28,
+            fat = 14,
+            carbs = 48,
             ingredients = listOf(
                 "1 con gà.",
                 "Gạo tẻ.",
                 "Gia vị: muối, tiêu."
             ),
             instructions = listOf(
-                "1. Luộc gà cho chín.",
-                "2. Nấu cơm và xối mỡ lên trên."
+                "Luộc gà cho chín.",
+                "Nấu cơm và xối mỡ lên trên."
             )
         ),
         Meal(
@@ -241,14 +314,19 @@ class MealRepository {
             name = "Bò xào rau củ",
             imageResId = R.drawable.bo_xao_rau_cu,
             category = "Lunch",
+            calories = 400,
+            weight = 360,
+            protein = 24,
+            fat = 8,
+            carbs = 48,
             ingredients = listOf(
                 "300g thịt bò.",
                 "100g rau củ.",
                 "Gia vị: nước mắm, tiêu."
             ),
             instructions = listOf(
-                "1. Thái thịt bò và ướp gia vị.",
-                "2. Xào thịt bò với rau củ cho đến khi chín."
+                "Thái thịt bò và ướp gia vị.",
+                "Xào thịt bò với rau củ cho đến khi chín."
             )
         ),
         Meal(
@@ -256,15 +334,20 @@ class MealRepository {
             name = "Canh chua cá",
             imageResId = R.drawable.canhchua,
             category = "Dinner",
+            calories = 320,
+            weight = 280,
+            protein = 26,
+            fat = 14,
+            carbs = 10,
             ingredients = listOf(
                 "300g cá.",
                 "200g cà chua.",
                 "Gia vị: me, nước mắm."
             ),
             instructions = listOf(
-                "1. Nấu nước dùng với me.",
-                "2. Thêm cá và cà chua vào nấu chín.",
-                "3. Nêm nếm vừa ăn."
+                "Nấu nước dùng với me.",
+                "Thêm cá và cà chua vào nấu chín.",
+                "Nêm nếm vừa ăn."
             )
         ),
         Meal(
@@ -272,6 +355,11 @@ class MealRepository {
             name = "Lẩu gà lá é",
             imageResId = R.drawable.lau_ga_la_e,
             category = "Dinner",
+            calories = 350,
+            weight = 300,
+            protein = 22,
+            fat = 10,
+            carbs = 8,
             ingredients = listOf(
                 "1 con gà ta.",
                 "100g lá é.",
@@ -280,11 +368,11 @@ class MealRepository {
                 "Gia vị: muối, đường, hạt nêm."
             ),
             instructions = listOf(
-                "1. Làm sạch gà, chặt miếng vừa ăn.",
-                "2. Phi thơm sả tỏi, xào sơ gà.",
-                "3. Cho nước vào đun sôi, thả lá é.",
-                "4. Nêm gia vị vừa ăn.",
-                "5. Nhúng rau và thịt gà khi ăn."
+                "Làm sạch gà, chặt miếng vừa ăn.",
+                "Phi thơm sả tỏi, xào sơ gà.",
+                "Cho nước vào đun sôi, thả lá é.",
+                "Nêm gia vị vừa ăn.",
+                "Nhúng rau và thịt gà khi ăn."
             )
         ),
         Meal(
@@ -292,15 +380,20 @@ class MealRepository {
             name = "Cháo gà",
             imageResId = R.drawable.chao_ga,
             category = "Dinner",
+            calories = 250,
+            weight = 250,
+            protein = 6,
+            fat = 3,
+            carbs = 20,
             ingredients = listOf(
                 "200g gạo.",
                 "300g thịt gà.",
                 "Gia vị: muối, tiêu."
             ),
             instructions = listOf(
-                "1. Nấu gạo với nước cho đến khi nhuyễn.",
-                "2. Thêm thịt gà vào nấu chín.",
-                "3. Nêm nếm vừa ăn."
+                "Nấu gạo với nước cho đến khi nhuyễn.",
+                "Thêm thịt gà vào nấu chín.",
+                "Nêm nếm vừa ăn."
             )
         ),
         Meal(
@@ -308,15 +401,20 @@ class MealRepository {
             name = "Canh rau ngót thịt băm",
             imageResId = R.drawable.rau_ngot_thit_bam,
             category = "Dinner",
+            calories = 280,
+            weight = 220,
+            protein = 16,
+            fat = 6,
+            carbs = 24,
             ingredients = listOf(
                 "200g rau ngót.",
                 "100g thịt băm.",
                 "Gia vị: muối, tiêu."
             ),
             instructions = listOf(
-                "1. Nấu nước dùng.",
-                "2. Thêm thịt băm vào nấu chín.",
-                "3. Thêm rau ngót vào và nêm nếm."
+                "Nấu nước dùng.",
+                "Thêm thịt băm vào nấu chín.",
+                "Thêm rau ngót vào và nêm nếm."
             )
         ),
         Meal(
@@ -324,6 +422,11 @@ class MealRepository {
             name = "Trứng chiên thịt",
             imageResId = R.drawable.trung_chien_thit,
             category = "Dinner",
+            calories = 400,
+            weight = 350,
+            protein = 30,
+            fat = 10,
+            carbs = 45,
             ingredients = listOf(
                 "4 quả trứng.",
                 "100g thịt băm.",
@@ -340,6 +443,11 @@ class MealRepository {
             name = "Cá hấp hành gừng",
             imageResId = R.drawable.ca_hap_hanh_gung,
             category = "Dinner",
+            calories = 380,
+            weight = 360,
+            protein = 18,
+            fat = 12,
+            carbs = 55,
             ingredients = listOf(
                 "300g cá.",
                 "50g hành.",
@@ -347,9 +455,9 @@ class MealRepository {
                 "Gia vị: muối, tiêu."
             ),
             instructions = listOf(
-                "1. Thái hành và gừng.",
-                "2. Ướp cá với gia vị.",
-                "3. Hấp cá với hành và gừng."
+                "Thái hành và gừng.",
+                "Ướp cá với gia vị.",
+                "Hấp cá với hành và gừng."
             )
         ),
         Meal(
@@ -357,15 +465,20 @@ class MealRepository {
             name = "Cơm rang trứng",
             imageResId = R.drawable.com_rang_trung,
             category = "Dinner",
+            calories = 300,
+            weight = 280,
+            protein = 18,
+            fat = 6,
+            carbs = 20,
             ingredients = listOf(
                 "2 chén cơm.",
                 "2 quả trứng.",
                 "Gia vị: muối, tiêu."
             ),
             instructions = listOf(
-                "1. Đánh trứng và chiên.",
-                "2. Thêm cơm vào xào.",
-                "3. Nêm nếm vừa ăn."
+                "Đánh trứng và chiên.",
+                "Thêm cơm vào xào.",
+                "Nêm nếm vừa ăn."
             )
         ),
         Meal(
@@ -373,15 +486,20 @@ class MealRepository {
             name = "Đậu hũ sốt cà chua",
             imageResId = R.drawable.dau_hu_sot_ca_chua,
             category = "Dinner",
+            calories = 350,
+            weight = 350,
+            protein = 28,
+            fat = 12,
+            carbs = 40,
             ingredients = listOf(
                 "200g đậu hũ.",
                 "100g cà chua.",
                 "Gia vị: muối, đường."
             ),
             instructions = listOf(
-                "1. Chiên đậu hũ cho vàng.",
-                "2. Xào cà chua với gia vị.",
-                "3. Thêm đậu hũ vào và nấu chín."
+                "Chiên đậu hũ cho vàng.",
+                "Xào cà chua với gia vị.",
+                "Thêm đậu hũ vào và nấu chín."
             )
         )
     )
@@ -405,8 +523,11 @@ class MealRepository {
     }
 
     fun getRandomMeal(): Meal? {
-        return meals.randomOrNull().also {
-            println("MealRepository: Random meal=${it?.id to it?.name}")
+        val selectedMeal = meals.randomOrNull()
+        return selectedMeal?.copy(
+            dayOfWeek = days.random(random)
+        ).also {
+            println("MealRepository: Random meal=${it?.id to it?.name}, dayOfWeek=${it?.dayOfWeek}")
         }
     }
 }

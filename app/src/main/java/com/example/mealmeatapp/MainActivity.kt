@@ -13,15 +13,18 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.mealmateapp.ui.theme.view.HomeScreen
+import com.example.mealmateapp.ui.theme.view.FavoriteScreen
+import com.example.mealmateapp.ui.theme.view.FoodDetailScreen
 import com.example.mealmeatapp.controller.AuthViewModel
 import com.example.mealmeatapp.ui.theme.controller.HomeViewModel
 import com.example.mealmeatapp.ui.theme.MealtimeAppTheme
-import com.example.mealmeatapp.ui.theme.view.FoodDetailScreen
 import com.example.mealmeatapp.ui.theme.view.ForgotPasswordScreen
+import com.example.mealmeatapp.ui.theme.view.HomeScreen
+import com.example.mealmeatapp.ui.theme.view.MealPlannerScreen
 import com.example.mealmeatapp.ui.theme.view.MealtimeScreen
 import com.example.mealmeatapp.ui.theme.view.SignInScreen
 import com.example.mealmeatapp.ui.theme.view.SignUpScreen
+
 
 class MainActivity : ComponentActivity() {
     private val authViewModel: AuthViewModel by viewModels()
@@ -94,6 +97,12 @@ fun AppNavigation(
         }
         composable("home") {
             HomeScreen(viewModel = homeViewModel, navController = navController)
+        }
+        composable("favorite") {
+            FavoriteScreen(viewModel = homeViewModel, navController = navController)
+        }
+        composable("mealplanner") {
+            MealPlannerScreen(viewModel = homeViewModel, navController = navController)
         }
         composable(
             route = "foodDetail/{mealId}",

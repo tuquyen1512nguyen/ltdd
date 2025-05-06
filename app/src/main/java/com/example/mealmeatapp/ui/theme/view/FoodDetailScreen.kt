@@ -1,8 +1,9 @@
-package com.example.mealmeatapp.ui.theme.view
+package com.example.mealmateapp.ui.theme.view
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -16,6 +17,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Black
+import androidx.compose.ui.graphics.Color.Companion.Blue
+import androidx.compose.ui.graphics.Color.Companion.Green
+import androidx.compose.ui.graphics.Color.Companion.Yellow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -120,14 +125,45 @@ fun FoodDetailScreen(
                 ) {
                     Icon(
                         painter = painterResource(
-                            id = if (isFavorite) android.R.drawable.btn_star_big_on
-                            else android.R.drawable.btn_star_big_off
+                            id = if (isFavorite) R.drawable.favorite else R.drawable.favorite_filler
                         ),
                         contentDescription = "Favorite",
                         tint = favoriteIconColor,
                         modifier = Modifier.size(32.dp)
                     )
                 }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Nutrient Section
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                NutrientCircle(
+                    label = "kcal",
+                    value = meal.calories.toString(),
+                    color = Orange
+                )
+                NutrientCircle(
+                    label = "Protein",
+                    value = "${meal.protein}g",
+                    color = Green
+                )
+                NutrientCircle(
+                    label = "Fat",
+                    value = "${meal.fat}g",
+                    color = Yellow
+                )
+                NutrientCircle(
+                    label = "Carbs",
+                    value = "${meal.carbs}g",
+                    color = Blue
+                )
             }
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -193,6 +229,40 @@ fun FoodDetailScreen(
             }
 
             Spacer(modifier = Modifier.height(16.dp))
+        }
+    }
+}
+
+@Composable
+fun NutrientCircle(
+    label: String,
+    value: String,
+    color: Color
+) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .size(60.dp) // Increased size to fit both value and label
+            .clip(CircleShape)
+            .border(2.dp, color, CircleShape) // Colored border with no background fill
+            .padding(4.dp)
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = value,
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold
+                ),
+                color = Black // Black text for value
+            )
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelSmall.copy(fontSize = 12.sp),
+                color = Black // Black text for label
+            )
         }
     }
 }

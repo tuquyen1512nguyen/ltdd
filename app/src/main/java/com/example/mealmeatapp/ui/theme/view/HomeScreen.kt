@@ -1,4 +1,4 @@
-package com.example.mealmateapp.ui.theme.view
+package com.example.mealmeatapp.ui.theme.view
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -6,17 +6,22 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Black
+import androidx.compose.ui.graphics.Color.Companion.Blue
+import androidx.compose.ui.graphics.Color.Companion.Green
+import androidx.compose.ui.graphics.Color.Companion.White
+import androidx.compose.ui.graphics.Color.Companion.Yellow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -25,9 +30,9 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.mealmeatapp.R
-import com.example.mealmeatapp.ui.theme.model.Meal
 import com.example.mealmeatapp.ui.theme.*
 import com.example.mealmeatapp.ui.theme.controller.HomeViewModel
+import com.example.mealmeatapp.ui.theme.model.Meal
 
 @Composable
 fun HomeScreen(
@@ -38,7 +43,7 @@ fun HomeScreen(
 
     Scaffold(
         bottomBar = {
-            BottomNavigationBar(navController)
+            BottomNavigationBar(navController, viewModel.plannedMeals.size)
         }
     ) { padding ->
         LazyColumn(
@@ -73,7 +78,7 @@ fun HomeScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Các category button
+                // Category buttons
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
@@ -94,7 +99,7 @@ fun HomeScreen(
                             Text(
                                 text = category.uppercase(),
                                 style = MaterialTheme.typography.bodySmall.copy(fontSize = 10.sp),
-                                fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold
+                                fontWeight = FontWeight.SemiBold
                             )
                         }
                     }
@@ -147,29 +152,20 @@ fun HomeScreen(
                 Spacer(modifier = Modifier.height(24.dp))
             }
 
-            // Hiển thị 2 món ăn mỗi hàng
-            items(viewModel.meals.value.chunked(2)) { rowMeals ->
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 6.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
+            // Display meals based on selected category
+            items(viewModel.meals.value) { meal ->
+                if (viewModel.selectedCategory.value == "All" || meal.category == viewModel.selectedCategory.value) {
                     MealItemLarge(
-                        meal = rowMeals[0],
-                        modifier = Modifier.weight(1f),
-                        onClick = { navController.navigate("foodDetail/${rowMeals[0].id}") }
+                        meal = meal,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 6.dp),
+                        isFavorite = viewModel.favoriteMeals.contains(meal),
+                        isPlanned = viewModel.plannedMeals.contains(meal),
+                        onFavoriteClick = { viewModel.toggleFavorite(meal) },
+                        onPlanClick = { viewModel.addPlannedMeal(meal) },
+                        onClick = { navController.navigate("foodDetail/${meal.id}") }
                     )
-
-                    if (rowMeals.size > 1) {
-                        MealItemLarge(
-                            meal = rowMeals[1],
-                            modifier = Modifier.weight(1f),
-                            onClick = { navController.navigate("foodDetail/${rowMeals[1].id}") }
-                        )
-                    } else {
-                        Spacer(modifier = Modifier.weight(1f))
-                    }
                 }
             }
         }
@@ -180,43 +176,109 @@ fun HomeScreen(
 fun MealItemLarge(
     meal: Meal,
     modifier: Modifier = Modifier,
+    isFavorite: Boolean,
+    isPlanned: Boolean,
+    onFavoriteClick: () -> Unit,
+    onPlanClick: () -> Unit,
     onClick: () -> Unit
 ) {
     Card(
-        shape = RoundedCornerShape(8.dp),
+        shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         modifier = modifier
-            .height(170.dp)
             .clickable { onClick() }
     ) {
-        Column {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Circular image
             Image(
                 painter = painterResource(id = meal.imageResId),
                 contentDescription = meal.name,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(130.dp)
+                    .size(80.dp)
+                    .clip(CircleShape)
             )
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 15.dp, vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            // Meal details
+            Column(
+                modifier = Modifier.weight(1f)
             ) {
+                // Meal name (bold)
                 Text(
                     text = meal.name,
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold
+                    ),
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f)
+                    overflow = TextOverflow.Ellipsis
                 )
+                Spacer(modifier = Modifier.height(4.dp))
+
+                // Calorie info (small, faded)
+                Text(
+                    text = "${meal.calories} kcal • ${meal.weight}g",
+                    style = MaterialTheme.typography.bodySmall.copy(fontSize = 12.sp),
+                    color = Gray.copy(alpha = 0.6f)
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Nutrient row with circles
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    NutrientItemWithBar(
+                        label = "Protein",
+                        value = meal.protein,
+                        maxValue = 50,
+                        color = Green
+                    )
+                    NutrientItemWithBar(
+                        label = "Fat",
+                        value = meal.fat,
+                        maxValue = 50,
+                        color = Yellow
+                    )
+                    NutrientItemWithBar(
+                        label = "Carbs",
+                        value = meal.carbs,
+                        maxValue = 50,
+                        color = Blue
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            // Favorite and Plan icons
+            Column(
+                horizontalAlignment = Alignment.End
+            ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.favorite),
+                    painter = painterResource(id = if (isFavorite) R.drawable.favorite else R.drawable.favorite_filler),
                     contentDescription = "Favorite",
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(24.dp)
+                    tint = if (isFavorite) Orange else MaterialTheme.colorScheme.primary,
+                    modifier = Modifier
+                        .size(24.dp)
+                        .clickable { onFavoriteClick() }
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Icon(
+                    painter = painterResource(id = if (isPlanned) R.drawable.check else R.drawable.add),
+                    contentDescription = if (isPlanned) "Planned" else "Add to Plan",
+                    tint = if (isPlanned) Orange else MaterialTheme.colorScheme.primary,
+                    modifier = Modifier
+                        .size(24.dp)
+                        .clickable { onPlanClick() }
                 )
             }
         }
@@ -224,10 +286,54 @@ fun MealItemLarge(
 }
 
 @Composable
-fun BottomNavigationBar(navController: NavController) {
+fun NutrientItemWithBar(label: String, value: Int, maxValue: Int, color: Color) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // Vertical progress bar
+        Box(
+            modifier = Modifier
+                .width(4.dp)
+                .height(40.dp)
+                .clip(RoundedCornerShape(2.dp))
+                .background(Gray.copy(alpha = 0.2f))
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight((value.toFloat() / maxValue).coerceIn(0f, 1f))
+                    .clip(RoundedCornerShape(2.dp))
+                    .background(color)
+                    .align(Alignment.BottomStart)
+            )
+        }
+
+        Spacer(modifier = Modifier.width(6.dp))
+
+        // Nutrient info
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = "${value}g",
+                style = MaterialTheme.typography.bodySmall.copy(
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold
+                ),
+                color = Black
+            )
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp),
+                color = Black
+            )
+        }
+    }
+}
+
+@Composable
+fun BottomNavigationBar(navController: NavController, plannedCount: Int) {
     val navItems = listOf(
         BottomNavItem("home", R.drawable.home, "Home"),
-        BottomNavItem("planner", R.drawable.planner, "Planner"),
+        BottomNavItem("planner", R.drawable.planner, "Planner ($plannedCount)"),
         BottomNavItem("favorite", R.drawable.heart, "Favorite"),
         BottomNavItem("setting", R.drawable.setting, "Setting"),
     )
